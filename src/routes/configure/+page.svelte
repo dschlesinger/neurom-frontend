@@ -4,9 +4,11 @@
 
   import { artifacts, artifact_colors } from "$lib/components/global_vars.svelte";
   import ArtifactCard from "$lib/components/artifact/artifact-card.svelte";
+  import { toast } from "svelte-sonner";
 
   import Input from "$lib/components/ui/input/input.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import { Label } from "$lib/components/ui/dropdown-menu";
   import { Separator } from "$lib/components/ui/separator/index.js";
 
   let num_added: number = 0;
@@ -17,17 +19,28 @@
 
   function addArtifact(name: string) {
 
-    artifacts.current.push(
-        {
-            name: name,
-            color: artifact_colors[num_added % artifact_colors.length]
-        }
-    )
+    if (!artifacts.current.map((a) => a.name).includes(name)) {
 
-    num_added++;
+        artifacts.current.push(
+            {
+                name: name,
+                color: artifact_colors[num_added % artifact_colors.length]
+            }
+        )
 
-    new_artifact = '';
+        num_added++;
 
+        new_artifact = '';
+    }
+    else {
+        toast.warning("Artifact already exists")
+    }
+  }
+
+  function handleEnter(e) {
+    if (e.key == 'Enter' && !(new_artifact == '')) {
+        addArtifact(new_artifact)
+    }
   }
 
 </script>
@@ -53,11 +66,12 @@
                 <div class='flex flex-col gap-4'>
                     <div class='flex gap-3 items-end'>
                         <div class='flex-1'>
-                            <label class='text-sm font-semibold text-slate-300 mb-2 block'>Create New Artifact</label>
+                            <Label class='text-sm font-semibold text-slate-300 mb-2 block'>Create New Artifact</Label>
                             <Input 
                                 class='w-full bg-slate-700/50 border-slate-600 focus:ring-blue-500 text-white' 
                                 bind:value={new_artifact} 
-                                placeholder='Enter artifact name...' 
+                                placeholder='Enter artifact name...'
+                                onkeydown={handleEnter}
                             />
                         </div>
                         <Button 

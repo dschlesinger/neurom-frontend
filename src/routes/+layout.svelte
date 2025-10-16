@@ -2,7 +2,7 @@
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { Keyboard, CircleOff  } from '@lucide/svelte';
-
+	import { Toaster } from "$lib/components/ui/sonner/index.js";
 
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
@@ -61,6 +61,8 @@
 <svelte:head>
 	<link rel="icon" href={favicon} />
 </svelte:head>
+
+<Toaster />
 
 <!-- Nav Bar -->
 <div class='w-screen h-screen flex flex-col'>
