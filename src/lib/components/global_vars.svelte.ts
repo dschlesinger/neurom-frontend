@@ -21,6 +21,8 @@ export const artifact_colors = [
   "bg-gradient-to-br from-stone-300 to-neutral-400"     // Stone gradient
 ]
 
+export let number_sample_per_artifact: {current: number} = $state({current: 5})
+
 interface Artifact {
     name: string
     color: string
