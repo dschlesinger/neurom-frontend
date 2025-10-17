@@ -56,11 +56,26 @@
     // stuff for data gathering
 
     // Either 'start', 'listening', 'reviewing', or 'complete' <-- When all samples gathered
-    let data_gathering_stage: 'start' | 'listening' | 'reviewing' | 'complete' = $state('reviewing');
+    let data_gathering_stage: 'start' | 'listening' | 'reviewing' | 'complete' = $state('start');
 
     let current_artifact_index = $state(0);
 
     let current_sample_index = $state(0);
+
+    let dataset_name = $state('');
+
+    function resetGathering() {
+        // Reset
+        if (data_gathering_stage == 'start') {
+            current_artifact_index = 0;
+            current_sample_index = 0;
+        }
+        else {
+            toast.warning('Must be on starting page to reset')
+        }
+
+        // Ping backend
+    }
 
 </script>
 
@@ -165,13 +180,7 @@
                         class='ml-auto'
                         size="icon"
                         variant='destructive'
-                        onclick={() => {
-                            // Reset
-                            current_artifact_index = 0;
-                            current_sample_index = 0;
-
-                            // Ping backend
-                        }}
+                        onclick={resetGathering}
                     >
                         <RefreshCcw />
                     </Button>
@@ -183,6 +192,11 @@
                         onclick={() => { 
                             data_gathering_stage = 'listening' 
                             // for later add route
+
+                            // Timeout to move on for debugging
+                            setTimeout(() => {
+                                data_gathering_stage = 'reviewing'
+                            }, 1000)
                         }}
                         class='my-auto self-center'
                     >
@@ -249,9 +263,13 @@
                                             current_artifact_index += 1;
                                             current_sample_index = 0;
                                         }, 300)
+
+                                        data_gathering_stage = 'start';
+
                                     }
                                     else {
                                         // Nothing
+                                        data_gathering_stage = 'start';
                                     }
 
                                 }}
@@ -264,6 +282,40 @@
                     </div>
 
                 {:else if data_gathering_stage === 'complete'}
+
+                    <div class='w-full h-full flex items-center justify-center'>
+
+                        <div class='flex gap-x-2 mx-auto'>
+                            <Input 
+                                class='w-64 bg-slate-700/50 border-slate-600 focus:ring-blue-500 text-white' 
+                                bind:value={dataset_name} 
+                                placeholder='Name your dataset' 
+                            />
+                            <Button 
+                                class='bg-green-700'
+                                onclick={() => {
+                                    // Ping Backend
+                                }}
+                            >
+                                Save
+                            </Button>
+                        </div>
+
+                        <Button
+                            class='self-end absolute mb-5'
+                            onclick={
+                                () => {
+
+                                    data_gathering_stage = 'start';
+
+                                    resetGathering();
+                                }
+                            }
+                        >
+                            Make New Dataset <Redo />
+                        </Button>
+
+                    </div>
 
                 {:else}
                     <div class='mx-auto self-center'>Unknown stage {data_gathering_stage}</div>
