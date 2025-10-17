@@ -48,3 +48,27 @@ export let artifacts: {current: Artifact[]} = $state({
         },
     ]
 })
+
+interface SensorSampleData {
+    sensor: string
+    data: number[]
+}
+
+export let gathered_sample_data: {current: SensorSampleData[]} = $state({current: [
+    {
+        sensor: 'Sensor 1',
+        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+    },
+    {
+        sensor: 'Sensor 2',
+        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+    },
+    {
+        sensor: 'Sensor 3',
+        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+    },
+    {
+        sensor: 'Sensor 4',
+        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
+    },
+]})

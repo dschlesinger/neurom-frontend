@@ -1,26 +1,32 @@
 <script lang='ts'>
 
-  import * as Tabs from "$lib/components/ui/tabs/index.js";
+    import * as Tabs from "$lib/components/ui/tabs/index.js";
 
-  import { artifacts, artifact_colors, number_sample_per_artifact } from "$lib/components/global_vars.svelte";
-  import ArtifactCard from "$lib/components/artifact/artifact-card.svelte";
-  import { toast } from "svelte-sonner";
+    import { 
+        artifacts, 
+        artifact_colors, 
+        number_sample_per_artifact,
+        gathered_sample_data,
+    } from "$lib/components/global_vars.svelte";
+    import ArtifactCard from "$lib/components/artifact/artifact-card.svelte";
+    import SensorCard from "$lib/components/sample/sensor-card.svelte";
+    import { toast } from "svelte-sonner";
 
-  import Input from "$lib/components/ui/input/input.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import { Label } from "$lib/components/ui/dropdown-menu";
-  import { Separator } from "$lib/components/ui/separator/index.js";
+    import Input from "$lib/components/ui/input/input.svelte";
+    import Button from "$lib/components/ui/button/button.svelte";
+    import { Label } from "$lib/components/ui/dropdown-menu";
+    import { Separator } from "$lib/components/ui/separator/index.js";
 
-  import { Zap } from '@lucide/svelte';
-  // stuff for artifact selection
+    import { Zap } from '@lucide/svelte';
+    // stuff for artifact selection
 
-  let num_added: number = 0;
+    let num_added: number = 0;
 
-  let new_artifact: string = $state('');
+    let new_artifact: string = $state('');
 
-  let active_tab: 'select' | 'gather' = $state('select')
+    let active_tab: 'select' | 'gather' = $state('gather')
 
-  function addArtifact(name: string) {
+    function addArtifact(name: string) {
 
     if (!artifacts.current.map((a) => a.name).includes(name)) {
 
@@ -38,18 +44,18 @@
     else {
         toast.warning("Artifact already exists")
     }
-  }
+    }
 
-  function handleEnter(e) {
+    function handleEnter(e) {
     if (e.key == 'Enter' && !(new_artifact == '')) {
         addArtifact(new_artifact)
     }
-  }
+    }
 
-  // stuff for data gathering
+    // stuff for data gathering
 
-  // Either 'start', 'listening', 'reviewing', or 'complete' <-- When all samples gathered
-  let data_gathering_stage: 'start' | 'listening' | 'reviewing' | 'complete' = $state('start');
+    // Either 'start', 'listening', 'reviewing', or 'complete' <-- When all samples gathered
+    let data_gathering_stage: 'start' | 'listening' | 'reviewing' | 'complete' = $state('reviewing');
 
 </script>
 
@@ -159,6 +165,16 @@
 
 
                 {:else if data_gathering_stage === 'reviewing'}
+
+                    <div class='grid grid-cols-4 w-full h-full'>
+
+                        {#each gathered_sample_data.current as gsd}
+
+                            <SensorCard sensor={gsd.sensor} data={gsd.data} />
+
+                        {/each}
+
+                    </div>
 
                 {:else if data_gathering_stage === 'complete'}
 
