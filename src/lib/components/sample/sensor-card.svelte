@@ -1,14 +1,22 @@
 <script lang="ts">
  import * as Chart from "$lib/components/ui/chart/index.js";
- import { LineChart } from "layerchart";
+ import * as Card from "$lib/components/ui/card/index"
+ import { Axis, LineChart } from "layerchart";
  import { scaleLinear } from "d3-scale";
 
- import { 
-    gathered_sample_data
-  } from "$lib/components/global_vars.svelte";
+ let {
+  data,
+  sensor,
+  bg_color
+ } : {
+  data: number[],
+  sensor: string,
+  bg_color: string
+ } = $props();
+
  
- let data = $derived.by(() => {
-    const raw = gathered_sample_data.current[0].data ?? [];
+ let graphData = $derived.by(() => {
+    const raw = data ?? [];
     return raw.map((v, i) => ({
       x: i,
       y: v,
@@ -28,23 +36,42 @@
   } satisfies Chart.ChartConfig;
 </script>
  
-{#if data.length > 0}
-    <Chart.Container config={chartConfig}>
-      <LineChart 
-        {data} 
-        x="x"
-        xScale={scaleLinear()}
-        axis="x"
-        {series}
-        props={{
-          spline: { strokeWidth: 2 },
-        }}
-      >
-        {#snippet tooltip()}
-          <Chart.Tooltip />
-        {/snippet}
-      </LineChart>
-    </Chart.Container>
-{:else}
-    <div>No data</div>
-{/if}
+<Card.Root class={`${bg_color} h-fit border-slate-800 border-2`}>
+
+  <Card.Header>
+
+    <Card.Title>
+      <div class="text-center p-1 rounded-md">
+      { sensor }
+      </div>
+    </Card.Title>
+
+  </Card.Header>
+
+  <Card.Content>
+
+    {#if data.length > 0}
+        <Chart.Container inert config={chartConfig}>
+          <LineChart
+            data={graphData} 
+            x="x"
+            xScale={scaleLinear()}
+            axis="x"
+            {series}
+            props={{
+              spline: { strokeWidth: 2 },
+            }}
+          >
+            <!-- <Axis placeholder='left' rule /> -->
+            {#snippet tooltip()}
+              <!-- <Chart.Tooltip /> -->
+            {/snippet}
+          </LineChart>
+        </Chart.Container>
+    {:else}
+        <div>No data</div>
+    {/if}
+
+  </Card.Content>
+
+</Card.Root>

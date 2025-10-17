@@ -17,7 +17,8 @@
     import { Label } from "$lib/components/ui/dropdown-menu";
     import { Separator } from "$lib/components/ui/separator/index.js";
 
-    import { Zap } from '@lucide/svelte';
+    import { Zap, Redo, Check, RefreshCcw } from '@lucide/svelte';
+    import { resolve } from "$app/paths";
     // stuff for artifact selection
 
     let num_added: number = 0;
@@ -56,6 +57,10 @@
 
     // Either 'start', 'listening', 'reviewing', or 'complete' <-- When all samples gathered
     let data_gathering_stage: 'start' | 'listening' | 'reviewing' | 'complete' = $state('reviewing');
+
+    let current_artifact_index = $state(0);
+
+    let current_sample_index = $state(0);
 
 </script>
 
@@ -138,8 +143,40 @@
         </Tabs.Content>
 
         <Tabs.Content value="gather" class='flex-1 overflow-auto'>
-            <div class='w-full h-full bg-gradient-to-br from-slate-700/30 to-slate-600/20 rounded-xl p-8 backdrop-blur-sm border border-slate-600/30 shadow-inner flex items-center justify-center'>
+            <div class='w-full h-full bg-gradient-to-br from-slate-700/30 to-slate-600/20 rounded-xl p-8 backdrop-blur-sm border border-slate-600/30 shadow-inner flex flex-col items-center'>
                 
+                <!-- Progress Bar -->
+                <div class='w-128 absolute mb-10 bg-green-700/40 rounded-lg p-4 border border-slate-600/30 flex'>                     
+                    <div class='w-9/10'>
+                        <div class='flex justify-between items-center mb-2'>
+                            <span class='text-sm font-semibold text-slate-300'>{ artifacts.current[current_artifact_index].name }</span>
+                            <span class='text-sm font-semibold text-slate-300'>
+                                {current_sample_index} / {number_sample_per_artifact.current}
+                            </span>
+                        </div>
+                        <div class='w-full bg-slate-600/50 rounded-full h-2 overflow-hidden'>
+                            <div 
+                                class='bg-gradient-to-r from-blue-500 to-cyan-500 h-full rounded-full transition-all duration-300'
+                                style='width: {artifacts.current.length > 0 ? (current_sample_index / (number_sample_per_artifact.current)) * 100 : 0}%'
+                            ></div>
+                        </div>
+                    </div>
+                    <Button
+                        class='ml-auto'
+                        size="icon"
+                        variant='destructive'
+                        onclick={() => {
+                            // Reset
+                            current_artifact_index = 0;
+                            current_sample_index = 0;
+
+                            // Ping backend
+                        }}
+                    >
+                        <RefreshCcw />
+                    </Button>
+                </div>
+
                 {#if data_gathering_stage === 'start'}
 
                     <Button 
@@ -147,14 +184,14 @@
                             data_gathering_stage = 'listening' 
                             // for later add route
                         }}
-                        class='mx-auto self-center'
+                        class='my-auto self-center'
                     >
                         Gather Sample
                     </Button>
 
                 {:else if data_gathering_stage === 'listening'}
 
-                    <div class="flex flex-col gap-y-4">
+                    <div class="flex flex-col gap-y-4 my-auto">
                         <div class='motion-safe:animate-pulse'>
                             <Zap size={128} color={'yellow'} />
                         </div>
@@ -166,20 +203,70 @@
 
                 {:else if data_gathering_stage === 'reviewing'}
 
-                    <div class='grid grid-cols-4 w-full h-full'>
+                    <div class='w-full h-full flex-col items-center pt-24'>
+                        <div class='grid grid-cols-4 lg:grid-cols-6 gap-2'>
 
-                        {#each gathered_sample_data.current as gsd}
+                            {#each gathered_sample_data.current as gsd, i}
 
-                            <SensorCard sensor={gsd.sensor} data={gsd.data} />
+                                <SensorCard sensor={gsd.sensor} data={gsd.data} bg_color={ artifact_colors[i % artifact_colors.length] } />
 
-                        {/each}
+                            {/each}
 
+                        </div>
+
+                        <div class="pt-20 flex justify-center gap-x-20">
+                            
+                            <Button 
+                                variant='destructive'
+                                class='min-w-32'
+                                onclick={() => {
+                                    // Send ping to backend
+                                }}
+                            >
+                                <Redo />
+                                Redo Sample
+                            </Button>
+
+                            <Button 
+                                class='bg-green-700 text-white min-w-32'
+                                onclick={() => {
+                                    // Increment logic
+
+                                    current_sample_index += 1;
+
+                                    // We are done
+                                    if (
+                                        current_artifact_index >= artifacts.current.length - 1 &&
+                                        current_sample_index >= number_sample_per_artifact.current
+                                    ) {
+                                        data_gathering_stage = 'complete'
+                                    }
+                                    // We have reached the end of this artifact
+                                    else if (
+                                        current_sample_index >= number_sample_per_artifact.current
+                                    ) {
+                                        setTimeout(() => {
+                                            current_artifact_index += 1;
+                                            current_sample_index = 0;
+                                        }, 300)
+                                    }
+                                    else {
+                                        // Nothing
+                                    }
+
+                                }}
+                            >
+                                <Check />
+                                Continue
+                            </Button>
+
+                        </div>             
                     </div>
 
                 {:else if data_gathering_stage === 'complete'}
 
                 {:else}
-                <div class='mx-auto self-center'>Unknown stage {data_gathering_stage}</div>
+                    <div class='mx-auto self-center'>Unknown stage {data_gathering_stage}</div>
                 {/if}
 
             </div>
