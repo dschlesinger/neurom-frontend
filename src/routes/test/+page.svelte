@@ -17,7 +17,7 @@
     import * as Card from "$lib/components/ui/card/index.js";
     import { PieChart, Text } from "layerchart";
 
-    import { FlaskConical, Zap, Check, X  } from '@lucide/svelte';
+    import { FlaskConical, Zap, Check, X, FileText } from '@lucide/svelte';
 
     import {
         dataset_artifacts,
@@ -79,6 +79,8 @@
 
     })
 
+    
+
     let chartData = $derived(
         test_results.reduce((a, c) => {
             if (c.guess == c.correct) {
@@ -99,11 +101,14 @@
             },
             {
                 type: 'incorrect',
-                count: 1,
+                count: 0,
                 color: "#e00"
             }
         ]
     ))
+
+    $inspect(chartData)
+    $inspect(test_results)
 
     // What to do
     let testing_artifact_name = $state('');
@@ -296,65 +301,78 @@
                     </Card.Root>
                 </div>
 
-                <Button 
-                    class='absolute self-end mb-4 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold shadow-lg transition-all duration-200'
-                    onclick={
-                        async () => {
+                <div class='absolute self-end mb-4 flex gap-x-2'>
+                    <Button 
+                        class='bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold shadow-lg transition-all duration-200'
+                        onclick={
+                            async () => {
 
-                            if (current_selected_datasets.length == 0) {
-                                toast.warning('No Dataset Selected')
-                                return
-                            }
+                                if (current_selected_datasets.length == 0) {
+                                    toast.warning('No Dataset Selected')
+                                    return
+                                }
 
-                            testing_stage = 'listening';
+                                testing_stage = 'listening';
 
-                            if (
-                                current_test_artifact == 'None'
-                            ) {
+                                if (
+                                    current_test_artifact == 'None'
+                                ) {
 
-                            }
-                            else if (
-                                current_test_artifact == 'Random'
-                            ) {
-                                testing_artifact_name = choose(dataset_artifacts.current)
-                            }
-                            else {
-                                testing_artifact_name = current_test_artifact
-                            }
+                                }
+                                else if (
+                                    current_test_artifact == 'Random'
+                                ) {
+                                    testing_artifact_name = choose(dataset_artifacts.current)
+                                }
+                                else {
+                                    testing_artifact_name = current_test_artifact
+                                }
 
-                            // Do count down
-                            countdown_active = true;
-                            countdown_counter = 3;
-                            
-                            for (let i = 0; i < 3; i++) {
-                                await new Promise(resolve => setTimeout(resolve, 1000));
-                                countdown_counter--;
-                            }
-                            
-                            countdown_active = false;
-                            countdown_counter = 3;
+                                // Do count down
+                                countdown_active = true;
+                                countdown_counter = 3;
+                                
+                                for (let i = 0; i < 3; i++) {
+                                    await new Promise(resolve => setTimeout(resolve, 1000));
+                                    countdown_counter--;
+                                }
+                                
+                                countdown_active = false;
+                                countdown_counter = 3;
 
-                            // For debugging
-                            setTimeout(() => {
-                                testing_stage = 'sample'
-                            }, 1000)
+                                // For debugging
+                                setTimeout(() => {
+                                    testing_stage = 'sample'
+                                }, 1000)
 
-                            // Ping backend and get
+                                // Ping backend and get
 
-                            if (current_test_artifact != 'None') {                      
-                                test_results.push(
-                                    {
-                                        correct: testing_artifact_name,
-                                        guess: choose(dataset_artifacts.current)
-                                    }
-                                )
+                                if (current_test_artifact != 'None') {                      
+                                    test_results.push(
+                                        {
+                                            correct: testing_artifact_name,
+                                            guess: choose(dataset_artifacts.current)
+                                        }
+                                    )
+                                }
                             }
                         }
-                    }
-                >
-                    Run Test 
-                    <FlaskConical size={18} class="ml-2" />
-                </Button>
+                    >
+                        Run Test 
+                        <FlaskConical size={18} class="ml-2" />
+                    </Button>
+                    <Button
+                        class='bg-gradient-to-r from-lime-500 to-green-600 hover:from-lime-400 hover:to-green-500 text-white font-semibold shadow-lg transition-all duration-200'
+                        onclick={() => {
+                            // Get data on self test
+
+                            // replace current tests
+                        }}
+                    >
+                        Test on Data
+                        <FileText size={18} class="ml-2" />
+                    </Button>
+            </div>
 
             </div>
 
