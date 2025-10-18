@@ -49,6 +49,25 @@ export let artifacts: {current: Artifact[]} = $state({
     ]
 })
 
+// Get from backend, dummy data for now
+export let dataset_artifacts = $state({
+    current: [
+        'Single Blink',
+        'Double Blink',
+        'Left Look',
+        'Right Look',
+    ]
+})
+
+// Fetch from backend
+export let available_datasets = $state({
+    current: [
+        'Dataset 1',
+        'Dataset 2',
+        'Dataset 3'
+    ]
+})
+
 interface SensorSampleData {
     sensor: string
     data: number[]
@@ -72,3 +91,8 @@ export let gathered_sample_data: {current: SensorSampleData[]} = $state({current
         data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
     },
 ]})
+
+export function choose(choices: any[]) {
+  var index = Math.floor(Math.random() * choices.length);
+  return choices[index];
+}
