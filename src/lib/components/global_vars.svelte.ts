@@ -21,6 +21,20 @@ export const artifact_colors = [
   "bg-gradient-to-br from-stone-300 to-neutral-400"     // Stone gradient
 ]
 
+interface ConnectionStatusProps {
+    backend: Boolean
+    muse: 'streaming' | 'buffering' | 'not connected'
+    keybindings: Boolean
+};
+
+export let connectionStatus: {current: ConnectionStatusProps} = $state({
+    current: {
+        'backend': false,
+        'muse': 'not connected',
+        'keybindings': false,
+    }
+})
+
 export let number_sample_per_artifact: {current: number} = $state({current: 5})
 
 interface Artifact {
@@ -65,6 +79,63 @@ export let available_datasets = $state({
         'Dataset 1',
         'Dataset 2',
         'Dataset 3'
+    ]
+})
+
+// Keybinding presets
+export let keybinding_presets = $state({
+    current: [
+        'Basic 9',
+        'Snake 4'
+    ]
+})
+
+export interface KeyAction {
+    // Whether to hold key down
+    hold: Boolean
+
+    // [[concurrently], [then]]
+    keys: string[][]
+}
+
+export interface KeyBinding {
+    // artifacts que in order
+    ordered_artifacts: string[]
+
+    keybind: KeyAction
+
+    // if keybind is set to reset
+    // Keys held down and que
+    // Superceedes keybind, keybind is not run
+    reset: boolean
+}
+
+export let current_keybindings: {current: KeyBinding[]} = $state({
+    current: [
+        {
+            ordered_artifacts: ['Single Blink'],
+            keybind: {
+                hold: false,
+                keys: [['space']]
+            },
+            reset: false
+        },
+        {
+            ordered_artifacts: ['Double Blink'],
+            keybind: {
+                hold: true,
+                keys: [['w']]
+            },
+            reset: false
+        },
+        {
+            ordered_artifacts: ['Left Look', 'Left Look'],
+            keybind: {
+                hold: false,
+                keys: [['a', 'w'], ['c', 'v']]
+            },
+            reset: false
+        },
     ]
 })
 

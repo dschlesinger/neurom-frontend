@@ -317,7 +317,7 @@
                                 if (
                                     current_test_artifact == 'None'
                                 ) {
-
+                                    testing_artifact_name = ''
                                 }
                                 else if (
                                     current_test_artifact == 'Random'
@@ -378,9 +378,11 @@
 
         {:else if testing_stage == 'listening'}
 
-            <div class="text-2xl font-semibold text-slate-200 mx-auto pt-10">
-                Please do a <span class='italic text-cyan-400 font-bold'>{ testing_artifact_name }</span>
-            </div>
+            {#if current_test_artifact != 'None'}
+                <div class="text-2xl font-semibold text-slate-200 mx-auto pt-10">
+                    Please do a <span class='italic text-cyan-400 font-bold'>{ testing_artifact_name }</span>
+                </div>
+            {/if}
 
             {#if countdown_active}
 
@@ -400,34 +402,38 @@
 
         {:else if testing_stage == 'sample'}
                 <div class='flex flex-col gap-y-6 h-full'>
-                <div class="mx-auto w-full max-w-sm rounded-lg bg-gradient-to-r from-slate-800 via-slate-800 to-slate-900 p-4 shadow-xl border border-slate-700/50">
-                    <div class="flex items-center gap-2 mb-3">
-                        {#if last_test.guess == last_test.correct}
-                            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-500/30 to-green-600/20 border border-green-500/60 shadow-lg shadow-green-500/20">
-                                <Check class='w-5 h-5 text-green-400' strokeWidth={3} />
+                    <div class="mx-auto w-full max-w-sm rounded-lg bg-gradient-to-r from-slate-800 via-slate-800 to-slate-900 p-4 shadow-xl border border-slate-700/50">
+                        {#if current_test_artifact != 'None'}
+                            <div class="flex items-center gap-2 mb-3">
+                                {#if last_test.guess == last_test.correct}
+                                    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-green-500/30 to-green-600/20 border border-green-500/60 shadow-lg shadow-green-500/20">
+                                        <Check class='w-5 h-5 text-green-400' strokeWidth={3} />
+                                    </div>
+                                    <span class="text-base font-bold text-green-400">Correct!</span>
+                                {:else} 
+                                    <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-red-500/30 to-red-600/20 border border-red-500/60 shadow-lg shadow-red-500/20">
+                                        <X class='w-4 h-4 text-red-400' strokeWidth={3} />
+                                    </div>
+                                    <span class="text-base font-bold text-red-400">Incorrect</span>
+                                {/if}
                             </div>
-                            <span class="text-base font-bold text-green-400">Correct!</span>
-                        {:else} 
-                            <div class="flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-red-500/30 to-red-600/20 border border-red-500/60 shadow-lg shadow-red-500/20">
-                                <X class='w-4 h-4 text-red-400' strokeWidth={3} />
-                            </div>
-                            <span class="text-base font-bold text-red-400">Incorrect</span>
                         {/if}
-                    </div>
 
-                    <div class="flex justify-between items-center border-t border-slate-700/50 pt-2">
-                        <div class="flex gap-4">
-                            <div class="flex items-center gap-2">
-                                <span class="text-slate-400 text-xs font-medium">Your Guess:</span>
-                                <span class="font-mono font-bold text-cyan-300 text-sm">{last_test.guess}</span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <span class="text-slate-400 text-xs font-medium">Correct Answer:</span>
-                                <span class="font-mono font-bold text-green-300 text-sm">{last_test.correct}</span>
+                        <div class="flex justify-between items-center border-t border-slate-700/50 pt-2">
+                            <div class="flex gap-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-slate-400 text-xs font-medium">Model Guess:</span>
+                                    <span class="font-mono font-bold text-cyan-300 text-sm">{last_test.guess}</span>
+                                </div>
+                                {#if current_test_artifact != 'None'}
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-slate-400 text-xs font-medium">Correct Answer:</span>
+                                        <span class="font-mono font-bold text-green-300 text-sm">{last_test.correct}</span>
+                                    </div>
+                                {/if}
                             </div>
                         </div>
                     </div>
-                </div>
 
                 <div class="w-full flex-1 flex flex-col items-center justify-start px-4">
                         <div class="grid grid-cols-4 lg:grid-cols-6 gap-4 w-full max-w-6xl">

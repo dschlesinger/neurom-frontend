@@ -7,18 +7,9 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
-	// Import Later
-	interface ConnectionStatusProps {
-		backend: Boolean
-		muse: 'streaming' | 'buffering' | 'not connected'
-		keybindings: Boolean
-	};
-
-	const connectionStatus: ConnectionStatusProps = {
-		'backend': false,
-		'muse': 'not connected',
-		'keybindings': false,
-	}
+	import {
+		connectionStatus
+	} from '$lib/components/global_vars.svelte';
 
 	function muse_status_to_color(status: string): string {
 		switch (status) {
@@ -53,6 +44,10 @@
 		{
 			'name': 'Test',
 			'route': '/test'
+		},
+		{
+			'name': 'Keybindings',
+			'route': '/keybinding'
 		},
 	];
 
@@ -127,7 +122,7 @@
 							</div>
 
 							<!-- Keybindings Status -->
-							<div class='flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50'>
+							<a href='/keybinding' class='flex hover:bg-blue-500 items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50'>
 								{#if connectionStatus.keybindings}
 									<Keyboard size={18} class='stroke-green-500' />
 								{:else}
@@ -137,7 +132,7 @@
 									<p class='text-sm font-medium'>Keybindings</p>
 									<p class='text-xs text-slate-400'>{connectionStatus.keybindings ? 'Enabled' : 'Disabled'}</p>
 								</div>
-							</div>
+							</a>
 						</div>
 					</DropdownMenu.Group>
 				</DropdownMenu.Content>
