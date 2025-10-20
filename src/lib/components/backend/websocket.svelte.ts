@@ -1,6 +1,8 @@
 import {
     connectionStatus,
-    current_selected_datasets
+    current_selected_datasets,
+    keybindings_on,
+    current_keybindings
 } from '$lib/components/global_vars.svelte'
 
 import {
@@ -250,6 +252,42 @@ export function startAnomolyDetection(name: string) {
             'type': 'start_anomoly_detection',
             'data': {
                 'classification': name
+            }
+        })
+    )
+
+}
+
+export function setKeybinds() {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'set_keybinds',
+            'data': {
+                'keybindings': current_keybindings.current
+            }
+        })
+    )
+
+}
+
+export function updateKeybindOn() {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'turn_keybinds',
+            'data': {
+                'state': keybindings_on.current
             }
         })
     )

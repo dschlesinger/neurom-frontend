@@ -11,7 +11,8 @@
 	import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
 
 	import {
-		connectionStatus
+		connectionStatus,
+		keybindings_on
 	} from '$lib/components/global_vars.svelte';
 
 	import {
@@ -132,14 +133,14 @@
 
 							<!-- Keybindings Status -->
 							<a href='/keybinding' class='flex hover:bg-blue-500 items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50'>
-								{#if connectionStatus.current.keybindings}
+								{#if keybindings_on.current}
 									<Keyboard size={18} class='stroke-green-500' />
 								{:else}
 									<CircleOff size={18} class='stroke-red-500' />
 								{/if}
 								<div>
 									<p class='text-sm font-medium'>Keybindings</p>
-									<p class='text-xs text-slate-400'>{connectionStatus.current.keybindings ? 'Enabled' : 'Disabled'}</p>
+									<p class='text-xs text-slate-400'>{keybindings_on.current ? 'Enabled' : 'Disabled'}</p>
 								</div>
 							</a>
 						</div>

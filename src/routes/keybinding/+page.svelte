@@ -4,6 +4,8 @@
     import Separator from "$lib/components/ui/separator/separator.svelte";
     import * as Select from "$lib/components/ui/select/index.js";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+    import { Label } from "$lib/components/ui/label/index.js";
+    import { Switch } from "$lib/components/ui/switch/index.js";
 
     import { 
         RotateCcw as Reset
@@ -16,10 +18,16 @@
         dataset_artifacts,
         keybinding_presets,
         current_keybindings,
+        keybindings_on,
 
-        type KeyBinding
+        type KeyBinding,
 
     } from "$lib/components/global_vars.svelte";
+
+    import { 
+        updateKeybindOn,
+        setKeybinds
+    } from '$lib/components/backend/websocket.svelte'
 
     let current_selected_datasets = $state([
         available_datasets.current[0]
@@ -210,13 +218,24 @@
 
         <div class='px-8 pb-8 flex flex-col items-center gap-2'>
 
-            <div class="">
+            <div class="flex gap-x-2 items-center">
+
+                <div class="text-white text-lg font-bold p-2 bg-slate-800 rounded-md">
+                    {#if keybindings_on.current}
+                        KB On
+                    {:else}
+                        KB Off
+                    {/if}
+                </div>
+
+                <Switch onCheckedChange={() => {updateKeybindOn()}} bind:checked={keybindings_on.current} id="kb-on" class='data-[state=unchecked]:bg-red-500 data-[state=checked]:bg-green-500 rotate-180' />
 
                 <Button 
                     class='bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold w-64 shadow-lg hover:shadow-blue-500/20 transition-all duration-200'
                     onclick={
                         () => {
                             last_keybind_state = JSON.stringify(current_keybindings.current)
+                            setKeybinds();
                         }
                     }
                 >

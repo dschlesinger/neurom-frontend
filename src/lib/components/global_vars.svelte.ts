@@ -157,4 +157,6 @@ export let test_results: {current: TestResult[]} = $state({
     current: []
 })
 
+export let keybindings_on: {current: boolean} = $state({current: false})
+
 export let testing_stage: {current: 'info' | 'listening' | 'sample'} = $state({current: 'info'});
