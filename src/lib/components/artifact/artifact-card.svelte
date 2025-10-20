@@ -9,11 +9,11 @@
 
 </script>
 
-<Card.Root class={`max-w-36 aspect-square ${bg_color} rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 backdrop-blur-md group hover:scale-105`}>
+<Card.Root class={`max-w-36 aspect-square ${bg_color} rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 backdrop-blur-md group`}>
 
     <div class='w-full h-full flex flex-col justify-between p-5 relative'>
         <!-- Gradient overlay for depth -->
-        <div class='absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30 pointer-events-none'></div>
+        <!-- <div class='absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/30 pointer-events-none'></div> -->
         
         <!-- Content -->
         <div class='relative z-10 flex flex-col items-center justify-center flex-1'>

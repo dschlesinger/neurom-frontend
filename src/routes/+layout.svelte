@@ -11,6 +11,8 @@
 		connectionStatus
 	} from '$lib/components/global_vars.svelte';
 
+	$inspect(connectionStatus)
+
 	function muse_status_to_color(status: string): string {
 		switch (status) {
 			case 'streaming':
@@ -90,7 +92,7 @@
 							{...props}
 							class='flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-slate-700 to-slate-600 hover:from-slate-600 hover:to-slate-500 border border-slate-500 transition-all duration-200 text-white font-medium shadow-md hover:shadow-lg'
 						>
-							<div class={`w-3 h-3 rounded-full animate-pulse ${connectionStatus.backend ? 'bg-green-500' : 'bg-red-500'}`}></div>
+							<div class={`w-3 h-3 rounded-full animate-pulse ${connectionStatus.current.backend ? 'bg-green-500' : 'bg-red-500'}`}></div>
 							<span class='text-sm'>Status</span>
 						</button>
 					{/snippet}
@@ -105,32 +107,32 @@
 						<div class='p-4 space-y-3'>
 							<!-- Backend Status -->
 							<div class='flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50'>
-								<div class={`w-3 h-3 rounded-full ${connectionStatus.backend ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+								<div class={`w-3 h-3 rounded-full ${connectionStatus.current.backend ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
 								<div>
 									<p class='text-sm font-medium'>Backend</p>
-									<p class='text-xs text-slate-400'>{connectionStatus.backend ? 'Connected' : 'Disconnected'}</p>
+									<p class='text-xs text-slate-400'>{connectionStatus.current.backend ? 'Connected' : 'Disconnected'}</p>
 								</div>
 							</div>
 
 							<!-- Muse Status -->
 							<div class='flex items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50'>
-								<div class={`w-3 h-3 rounded-full ${muse_status_to_color(connectionStatus.muse)} ${connectionStatus.muse === 'streaming' ? 'animate-pulse' : ''}`}></div>
+								<div class={`w-3 h-3 rounded-full ${muse_status_to_color(connectionStatus.current.muse)} ${connectionStatus.current.muse === 'streaming' ? 'animate-pulse' : ''}`}></div>
 								<div>
 									<p class='text-sm font-medium'>Muse Headset</p>
-									<p class='text-xs text-slate-400 capitalize'>{connectionStatus.muse}</p>
+									<p class='text-xs text-slate-400 capitalize'>{connectionStatus.current.muse}</p>
 								</div>
 							</div>
 
 							<!-- Keybindings Status -->
 							<a href='/keybinding' class='flex hover:bg-blue-500 items-center gap-3 p-3 rounded-lg bg-slate-700/50 border border-slate-600/50'>
-								{#if connectionStatus.keybindings}
+								{#if connectionStatus.current.keybindings}
 									<Keyboard size={18} class='stroke-green-500' />
 								{:else}
 									<CircleOff size={18} class='stroke-red-500' />
 								{/if}
 								<div>
 									<p class='text-sm font-medium'>Keybindings</p>
-									<p class='text-xs text-slate-400'>{connectionStatus.keybindings ? 'Enabled' : 'Disabled'}</p>
+									<p class='text-xs text-slate-400'>{connectionStatus.current.keybindings ? 'Enabled' : 'Disabled'}</p>
 								</div>
 							</a>
 						</div>

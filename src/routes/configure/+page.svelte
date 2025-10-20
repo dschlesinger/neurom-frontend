@@ -257,6 +257,7 @@
 								class="min-w-32"
 								onclick={() => {
 									// Send ping to backend
+									data_gathering_stage = 'start'
 								}}
 							>
 								<Redo />
