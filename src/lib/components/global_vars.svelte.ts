@@ -167,3 +167,7 @@ export function choose(choices: any[]) {
   var index = Math.floor(Math.random() * choices.length);
   return choices[index];
 }
+
+// For controlling progression of configure
+export let data_gathering_stage: {current: "begin" | "start" | "listening" | "reviewing" | "complete"} =
+		$state({current: "begin"});

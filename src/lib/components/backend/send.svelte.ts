@@ -19,3 +19,73 @@ export function pingBackend(): undefined {
     )
 
 }
+
+export function lastAnomNoGood(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'last_anomoly_no_good',
+            'data': {}
+        })
+    )
+
+    debugDP();
+
+}
+
+export function resetDatapoints(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'reset_anomoly_gathering',
+            'data': {}
+        })
+    )
+
+    debugDP();
+
+}
+
+export function debugDP(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'debug_datapoint',
+            'data': {}
+        })
+    )
+
+}
+
+export function startAnomolyDetection(name: string) {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'start_anomoly_detection',
+            'data': {
+                'classification': name
+            }
+        })
+    )
+
+}

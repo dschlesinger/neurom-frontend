@@ -1,4 +1,7 @@
 <script lang="ts">
+
+	import { onMount } from 'svelte';
+
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { Keyboard, CircleOff  } from '@lucide/svelte';
@@ -10,6 +13,10 @@
 	import {
 		connectionStatus
 	} from '$lib/components/global_vars.svelte';
+
+	import {
+		connectToBackend
+	} from '$lib/components/backend/websocket.svelte'
 
 	$inspect(connectionStatus)
 
@@ -52,6 +59,8 @@
 			'route': '/keybinding'
 		},
 	];
+
+	onMount(connectToBackend);
 
 </script>
 

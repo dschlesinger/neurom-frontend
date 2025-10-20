@@ -1,27 +1,29 @@
-// import {
-//     gathered_sample_data
-// } from '$lib/components/global_vars.svelte'
+import {
+    gathered_sample_data,
+    data_gathering_stage
+} from '$lib/components/global_vars.svelte'
 
-// export function handle_message(message: Map<string, any>): undefined {
+export function handle_message(message: Map<string, any>): undefined {
 
-//     switch (message['type']) {
+    switch (message['type']) {
 
-//         case 'ping':
+        case 'ping':
 
-//             console.log('ping')
+            console.log('ping')
 
-//             break;
+            break;
     
-//         case 'gathered_datapoint':
+        case 'gathered_datapoint':
 
-//             gathered_sample_data.current = message['data']['potentials']
+            gathered_sample_data.current = message['data']['potentials'];
+            data_gathering_stage.current = 'reviewing';
 
-//             break;
+            break;
 
-//         default:
+        default:
 
-//             console.log('Message type unknown', message)
+            console.log('Message type unknown', message)
 
-//     }
+    }
 
-// }
+}

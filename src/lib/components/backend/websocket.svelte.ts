@@ -10,7 +10,7 @@ export let websocket: WebSocket | undefined;
 
 // Handle reception
 
-async function connectToBackend() {
+export async function connectToBackend() {
     console.log('Attempting connection')
     try {
 
@@ -59,5 +59,3 @@ async function connectToBackend() {
         connectionStatus.current.keybindings = false;
     }
 }
-
-connectToBackend();

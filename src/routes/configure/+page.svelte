@@ -4,7 +4,8 @@
 		artifacts,
 		artifact_colors,
 		number_sample_per_artifact,
-		gathered_sample_data
+		gathered_sample_data,
+		data_gathering_stage
 	} from "$lib/components/global_vars.svelte";
 	import ArtifactCard from "$lib/components/artifact/artifact-card.svelte";
 	import SensorCard from "$lib/components/sample/sensor-card.svelte";
@@ -14,7 +15,12 @@
 	import { Label } from "$lib/components/ui/dropdown-menu";
 	import { Separator } from "$lib/components/ui/separator/index.js";
 	import { Zap, Redo, Check, RefreshCcw } from "@lucide/svelte";
-	import { resolve } from "$app/paths";
+
+	import { 
+		startAnomolyDetection,
+		lastAnomNoGood,
+		resetDatapoints
+	} from "$lib/components/backend/send.svelte";
 
 	// State for artifact selection
 	let num_added: number = 0;
@@ -49,9 +55,6 @@
 		}
 	}
 
-	// State for data gathering
-	let data_gathering_stage: "start" | "listening" | "reviewing" | "complete" =
-		$state("start");
 	let current_artifact_index = $state(0);
 	let current_sample_index = $state(0);
 	let dataset_name = $state("");
@@ -61,12 +64,10 @@
 	 * Only allows reset when on the starting page
 	 */
 	function resetGathering() {
-		if (data_gathering_stage === "start") {
-			current_artifact_index = 0;
-			current_sample_index = 0;
-		} else {
-			toast.warning("Must be on starting page to reset");
-		}
+		data_gathering_stage.current = 'begin'
+		current_artifact_index = 0;
+		current_sample_index = 0;
+		resetDatapoints()
 	}
 </script>
 
@@ -213,23 +214,31 @@
 					</Button>
 				</div>
 
+				{#if data_gathering_stage.current === 'begin'}
+
+				<Button
+						onclick={() => {
+							data_gathering_stage.current = "start";
+						}}
+						class="my-auto self-center bg-green-700"
+					>
+						Start
+					</Button>
+
 				<!-- Gathering Stages -->
-				{#if data_gathering_stage === "start"}
+				{:else if data_gathering_stage.current === "start"}
 					<!-- Start Stage: Initial Button -->
 					<Button
 						onclick={() => {
-							data_gathering_stage = "listening";
+							data_gathering_stage.current = "listening";
 
-							// Timeout to move on for debugging
-							setTimeout(() => {
-								data_gathering_stage = "reviewing";
-							}, 1000);
+							startAnomolyDetection(artifacts.current[current_artifact_index].name);
 						}}
 						class="my-auto self-center"
 					>
 						Gather Sample
 					</Button>
-				{:else if data_gathering_stage === "listening"}
+				{:else if data_gathering_stage.current === "listening"}
 					<!-- Listening Stage: Loading Animation -->
 					<div class="flex flex-col gap-y-4 my-auto">
 						<div class="motion-safe:animate-pulse">
@@ -237,7 +246,7 @@
 						</div>
 						<div class="text-white">Listening for Event...</div>
 					</div>
-				{:else if data_gathering_stage === "reviewing"}
+				{:else if data_gathering_stage.current === "reviewing"}
 					<!-- Reviewing Stage: Display Sensor Data and Action Buttons -->
 					<div class="w-full h-full flex-col items-center pt-24">
 						<div class="grid grid-cols-4 lg:grid-cols-6 gap-2">
@@ -257,7 +266,8 @@
 								class="min-w-32"
 								onclick={() => {
 									// Send ping to backend
-									data_gathering_stage = 'start'
+									data_gathering_stage.current = 'start'
+									lastAnomNoGood();
 								}}
 							>
 								<Redo />
@@ -275,7 +285,7 @@
 										current_artifact_index >= artifacts.current.length - 1 &&
 										current_sample_index >= number_sample_per_artifact.current
 									) {
-										data_gathering_stage = "complete";
+										data_gathering_stage.current = "complete";
 									}
 									// Check if all samples for current artifact are gathered
 									else if (current_sample_index >= number_sample_per_artifact.current) {
@@ -284,11 +294,11 @@
 											current_sample_index = 0;
 										}, 300);
 
-										data_gathering_stage = "start";
+										data_gathering_stage.current = "start";
 									}
 									// Move to next sample
 									else {
-										data_gathering_stage = "start";
+										data_gathering_stage.current = "start";
 									}
 								}}
 							>
@@ -297,7 +307,7 @@
 							</Button>
 						</div>
 					</div>
-				{:else if data_gathering_stage === "complete"}
+				{:else if data_gathering_stage.current === "complete"}
 					<!-- Complete Stage: Save Dataset -->
 					<div class="w-full h-full flex items-center justify-center">
 						<div class="flex gap-x-2 mx-auto">
@@ -319,7 +329,7 @@
 						<Button
 							class="self-end absolute mb-5"
 							onclick={() => {
-								data_gathering_stage = "start";
+								data_gathering_stage.current = "begin";
 								resetGathering();
 							}}
 						>
@@ -328,7 +338,7 @@
 					</div>
 				{:else}
 					<!-- Error: Unknown Stage -->
-					<div class="mx-auto self-center">Unknown stage {data_gathering_stage}</div>
+					<div class="mx-auto self-center">Unknown stage {data_gathering_stage.current}</div>
 				{/if}
 			</div>
 		</Tabs.Content>
