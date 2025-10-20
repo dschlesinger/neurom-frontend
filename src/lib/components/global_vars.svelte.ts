@@ -65,21 +65,12 @@ export let artifacts: {current: Artifact[]} = $state({
 
 // Get from backend, dummy data for now
 export let dataset_artifacts = $state({
-    current: [
-        'Single Blink',
-        'Double Blink',
-        'Left Look',
-        'Right Look',
-    ]
+    current: []
 })
 
 // Fetch from backend
 export let available_datasets = $state({
-    current: [
-        'Dataset 1',
-        'Dataset 2',
-        'Dataset 3'
-    ]
+    current: []
 })
 
 // Keybinding presets
@@ -144,30 +135,26 @@ interface SensorSampleData {
     data: number[]
 }
 
-export let gathered_sample_data: {current: SensorSampleData[]} = $state({current: [
-    {
-        sensor: 'Sensor 1',
-        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
-    },
-    {
-        sensor: 'Sensor 2',
-        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
-    },
-    {
-        sensor: 'Sensor 3',
-        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
-    },
-    {
-        sensor: 'Sensor 4',
-        data: [1, 2, 3, 4, 5, 1, 2, 3, 4, 5],
-    },
-]})
+export let gathered_sample_data: {current: SensorSampleData[]} = $state({current: []})
 
 export function choose(choices: any[]) {
   var index = Math.floor(Math.random() * choices.length);
   return choices[index];
 }
 
+export let current_selected_datasets = $state({current: []});
+
 // For controlling progression of configure
 export let data_gathering_stage: {current: "begin" | "start" | "listening" | "reviewing" | "complete"} =
 		$state({current: "begin"});
+
+export interface TestResult {
+    guess: string
+    correct: string
+}
+
+export let test_results: {current: TestResult[]} = $state({
+    current: []
+})
+
+export let testing_stage: {current: 'info' | 'listening' | 'sample'} = $state({current: 'info'});

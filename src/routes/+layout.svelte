@@ -18,8 +18,6 @@
 		connectToBackend
 	} from '$lib/components/backend/websocket.svelte'
 
-	$inspect(connectionStatus)
-
 	function muse_status_to_color(status: string): string {
 		switch (status) {
 			case 'streaming':

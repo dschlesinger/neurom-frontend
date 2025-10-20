@@ -19,8 +19,9 @@
 	import { 
 		startAnomolyDetection,
 		lastAnomNoGood,
-		resetDatapoints
-	} from "$lib/components/backend/send.svelte";
+		resetDatapoints,
+		saveDataset
+	} from "$lib/components/backend/websocket.svelte";
 
 	// State for artifact selection
 	let num_added: number = 0;
@@ -319,7 +320,7 @@
 							<Button
 								class="bg-green-700"
 								onclick={() => {
-									// Ping Backend
+									saveDataset(dataset_name)
 								}}
 							>
 								Save

@@ -1,5 +1,6 @@
 import {
-    connectionStatus
+    connectionStatus,
+    current_selected_datasets
 } from '$lib/components/global_vars.svelte'
 
 import {
@@ -7,6 +8,7 @@ import {
 } from '$lib/components/backend/recieve.svelte.ts'
 
 export let websocket: WebSocket | undefined;
+export let statusUpdater: EventSource | undefined;
 
 // Handle reception
 
@@ -37,8 +39,11 @@ export async function connectToBackend() {
             JSON.stringify({
                 'type': 'ping',
                 'data': {}
-            })
-    )
+            }))
+
+            connectToStatusUpdater();
+
+            get_datasets_list();
 
         }
 
@@ -58,4 +63,195 @@ export async function connectToBackend() {
         connectionStatus.current.muse = 'not connected';
         connectionStatus.current.keybindings = false;
     }
+}
+
+function connectToStatusUpdater() {
+
+    try {
+
+        statusUpdater = new EventSource('http://localhost:8000/status-updates');
+
+        statusUpdater.onopen = () => {
+            console.log('Status updater connected')
+        }
+
+        statusUpdater.onmessage = ((m) => {
+            let s = JSON.parse(m.data);
+            console.log('streaming recieved', s);
+            connectionStatus.current.muse = s.status;
+        })
+
+        statusUpdater.onerror = (error) => {
+            statusUpdater.close()
+            connectionStatus.current.muse = 'not connected'
+
+            setTimeout(connectToStatusUpdater, 3000);
+        }
+
+    }
+    
+    catch (error) {
+        console.log('status updater error')
+        statusUpdater = undefined;
+    }
+
+}
+
+export function pingBackend(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'ping',
+            'data': {}
+        })
+    )
+
+}
+
+export function lastAnomNoGood(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'last_anomoly_no_good',
+            'data': {}
+        })
+    )
+
+    debugDP();
+
+}
+
+export function sendDatasetUpdate(datasets: string): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'change_used_datasets',
+            'data': {
+                'used_datasets': current_selected_datasets.current
+            }
+        })
+    )
+
+    debugDP();
+
+}
+
+
+export function get_datasets_list() {
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'list_available_datasets',
+            'data': {
+            }
+        })
+    )
+}
+
+export function resetDatapoints(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'reset_anomoly_gathering',
+            'data': {}
+        })
+    )
+
+    debugDP();
+
+}
+
+export function debugDP(): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'debug_datapoint',
+            'data': {}
+        })
+    )
+
+}
+
+export function saveDataset(datasetName: string) {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'save_dataset',
+            'data': {
+                'dataset_name': datasetName
+            }
+        })
+    )
+
+}
+
+export function startTest(classification: string): undefined {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'start_test',
+            'data': {
+                'classification': classification
+            }
+        })
+    )
+
+}
+
+
+export function startAnomolyDetection(name: string) {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'start_anomoly_detection',
+            'data': {
+                'classification': name
+            }
+        })
+    )
+
 }

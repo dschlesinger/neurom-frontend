@@ -8,8 +8,18 @@
     import {
 		artifact_colors,
 		gathered_sample_data,
-        choose
+        choose,
+        dataset_artifacts,
+        available_datasets,
+        test_results,
+        testing_stage,
+        current_selected_datasets
 	} from "$lib/components/global_vars.svelte";
+
+    import {
+        sendDatasetUpdate,
+        startTest
+    } from '$lib/components/backend/websocket.svelte'
 
     import * as Select from "$lib/components/ui/select/index.js";
 
@@ -17,50 +27,22 @@
     import * as Card from "$lib/components/ui/card/index.js";
     import { PieChart, Text } from "layerchart";
 
-    import { FlaskConical, Zap, Check, X, FileText } from '@lucide/svelte';
+    import { FlaskConical, Zap, Check, X, FileText, TriangleAlert } from '@lucide/svelte';
 
     import {
-        dataset_artifacts,
-        available_datasets
     } from '$lib/components/global_vars.svelte'
     import { toast } from "svelte-sonner";
 
     let current_test_artifact = $state('Random');
 
-    let current_selected_datasets = $state([
-        available_datasets.current[0]
-    ]);
-
     // Handle stages
-
-    let testing_stage: 'info' | 'listening' | 'sample' = $state('info');
-
-    interface TestResult {
-        guess: string
-        correct: string
-    }
-
-    let test_results: TestResult[] = $state([
-        {
-            guess: 'Single Blink',
-            correct: 'Double Blink'
-        },
-        {
-            guess: 'Double Blink',
-            correct: 'Double Blink'
-        },
-        {
-            guess: 'Single Blink',
-            correct: 'Double Blink'
-        },
-    ])
 
     // tr by tr confusion matrix of scaling size
     let confusion_matrix = $derived.by(() => {
 
         let blank = Array(dataset_artifacts.current.length).fill(0).map(x => Array(dataset_artifacts.current.length).fill(0));
 
-        for (let tr of test_results) {
+        for (let tr of test_results.current) {
 
             const c_index: number = dataset_artifacts.current.indexOf(tr.correct);
             const g_index: number = dataset_artifacts.current.indexOf(tr.guess);
@@ -82,8 +64,11 @@
     
 
     let chartData = $derived(
-        test_results.reduce((a, c) => {
-            if (c.guess == c.correct) {
+        test_results.current.reduce((a, c) => {
+            if (c.correct == '*') {
+                // pass it is a None
+            }
+            else if (c.guess == c.correct) {
                 // Correct
                 a[0].count += 1;
             }
@@ -107,8 +92,7 @@
         ]
     ))
 
-    $inspect(chartData)
-    $inspect(test_results)
+    $inspect(chartData);
 
     // What to do
     let testing_artifact_name = $state('');
@@ -117,7 +101,7 @@
     
     // track last test
     let last_test = $derived(
-        test_results.length == 0 ? {correct: '', guess: ''} : test_results[test_results.length-1]
+        test_results.current.length == 0 ? {correct: '', guess: ''} : test_results.current[test_results.current.length-1]
     )
 
     const chartConfig = {
@@ -129,11 +113,15 @@
 </script>
 
 {#snippet dataset_select()}
-<Select.Root type="multiple" name="selectDatasets" bind:value={current_selected_datasets}>
+<Select.Root type="multiple" name="selectDatasets" bind:value={current_selected_datasets.current} onValueChange={sendDatasetUpdate}>
     <Select.Trigger 
         class="bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition-colors"
     >
-        Select Datasets
+        {#if current_selected_datasets.current.length > 0}
+            Select Datasets
+        {:else}
+            <div class="text-amber-500 block text-sm">No Dataset selected! <TriangleAlert size={12} class='stroke-amber-500' /></div>
+        {/if}
     </Select.Trigger>
     <Select.Content class='bg-slate-900 text-white border border-slate-700'>
         <Select.Group>
@@ -220,7 +208,7 @@
         <Separator class="bg-slate-700/50" />
 
         <!-- Stages here -->
-        {#if testing_stage == 'info'}
+        {#if testing_stage.current == 'info'}
 
             <!-- Accuracy and Confusion Matrix -->
             <div class='flex gap-x-6 w-full h-full justify-center items-start pt-8'>
@@ -230,7 +218,7 @@
                     <Card.Root class="flex flex-col w-56 lg:w-72 bg-gradient-to-br from-slate-800 to-slate-900 text-white border border-slate-700/50 shadow-xl">
                         <Card.Header class="items-center pb-2">
                             <Card.Title class='text-center text-lg'>Test Accuracy</Card.Title>
-                            <Card.Description class='text-slate-400 text-center text-sm'>Over { test_results.length } Samples</Card.Description>
+                            <Card.Description class='text-slate-400 text-center text-sm'>Over { test_results.current.length } Samples</Card.Description>
                         </Card.Header>
                         <Card.Content class="flex-1">
                             <Chart.Container inert config={chartConfig} class="mx-auto aspect-square">
@@ -247,9 +235,7 @@
                                         <!-- Text Accuracy display -->
                                         <Text
                                             value={`${
-                                                Math.round(test_results.filter(
-                                                    (c) => c.correct == c.guess
-                                                ).length / test_results.length * 100)
+                                                Math.round((chartData[0].count / (chartData.reduce((a, v) => a + v.count, 0)) * 100))
                                             }%`}
                                             textAnchor="middle"
                                             verticalAnchor="middle"
@@ -281,7 +267,7 @@
                                                 <Tooltip.Root>
                                                     <Tooltip.Trigger>
                                                         <div
-                                                        class={`w-10 h-10 flex items-center justify-center rounded-lg font-semibold transition-all ${r == c ? 'bg-gradient-to-br from-green-500/30 to-green-600/20 border border-green-500/50 text-green-200' : 'bg-gradient-to-br from-red-500/20 to-red-600/10 border border-red-500/30 text-red-200'}`}
+                                                        class={`${dataset_artifacts.current.length > 5 ? 'max-w-10 max-h-10' : 'w-10 h-10'} flex items-center justify-center rounded-lg font-semibold transition-all ${r == c ? 'bg-gradient-to-br from-green-500/30 to-green-600/20 border border-green-500/50 text-green-200' : 'bg-gradient-to-br from-red-500/20 to-red-600/10 border border-red-500/30 text-red-200'}`}
                                                     >
                                                         {point}
                                                     </div>
@@ -307,17 +293,17 @@
                         onclick={
                             async () => {
 
-                                if (current_selected_datasets.length == 0) {
+                                if (current_selected_datasets.current.length == 0) {
                                     toast.warning('No Dataset Selected')
                                     return
                                 }
 
-                                testing_stage = 'listening';
+                                testing_stage.current = 'listening';
 
                                 if (
                                     current_test_artifact == 'None'
                                 ) {
-                                    testing_artifact_name = ''
+                                    testing_artifact_name = '*'
                                 }
                                 else if (
                                     current_test_artifact == 'Random'
@@ -340,21 +326,8 @@
                                 countdown_active = false;
                                 countdown_counter = 3;
 
-                                // For debugging
-                                setTimeout(() => {
-                                    testing_stage = 'sample'
-                                }, 1000)
-
                                 // Ping backend and get
-
-                                if (current_test_artifact != 'None') {                      
-                                    test_results.push(
-                                        {
-                                            correct: testing_artifact_name,
-                                            guess: choose(dataset_artifacts.current)
-                                        }
-                                    )
-                                }
+                                startTest(testing_artifact_name);
                             }
                         }
                     >
@@ -376,7 +349,7 @@
 
             </div>
 
-        {:else if testing_stage == 'listening'}
+        {:else if testing_stage.current == 'listening'}
 
             {#if current_test_artifact != 'None'}
                 <div class="text-2xl font-semibold text-slate-200 mx-auto pt-10">
@@ -400,7 +373,7 @@
                 </div>
             {/if}
 
-        {:else if testing_stage == 'sample'}
+        {:else if testing_stage.current == 'sample'}
                 <div class='flex flex-col gap-y-6 h-full'>
                     <div class="mx-auto w-full max-w-sm rounded-lg bg-gradient-to-r from-slate-800 via-slate-800 to-slate-900 p-4 shadow-xl border border-slate-700/50">
                         {#if current_test_artifact != 'None'}
@@ -453,7 +426,7 @@
                         <Button
                             class="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-semibold min-w-40 shadow-lg transition-all duration-200"
                             onclick={() => {
-                                testing_stage = 'info'
+                                testing_stage.current = 'info'
                             }}
                         >
                             Continue
@@ -462,7 +435,7 @@
             </div>
 
         {:else}
-            <div class="text-slate-400 text-center pt-20">Unknown stage {testing_stage}</div>
+            <div class="text-slate-400 text-center pt-20">Unknown stage {testing_stage.current}</div>
         {/if}
 
     </div>
