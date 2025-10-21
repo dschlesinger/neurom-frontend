@@ -26,6 +26,12 @@ export function handle_message(message: Map<string, any>): undefined {
 
             break;
 
+        case 'update_test_data':
+
+            test_results.current = message['data']['on_data_results']
+
+            break;
+
         case 'update_datasets':
 
             available_datasets.current = message['data']['datasets']

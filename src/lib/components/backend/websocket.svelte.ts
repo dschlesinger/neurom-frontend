@@ -293,3 +293,19 @@ export function updateKeybindOn() {
     )
 
 }
+
+export function testOnData() {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'test_on_data',
+            'data': {}
+        })
+    )
+
+}

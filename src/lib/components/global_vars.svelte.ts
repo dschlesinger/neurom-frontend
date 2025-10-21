@@ -104,26 +104,10 @@ export interface KeyBinding {
 export let current_keybindings: {current: KeyBinding[]} = $state({
     current: [
         {
-            ordered_artifacts: ['Single Blink'],
+            ordered_artifacts: ['Single Blink', 'Single Blink'],
             keybind: {
                 hold: false,
                 keys: [['space']]
-            },
-            reset: false
-        },
-        {
-            ordered_artifacts: ['Double Blink'],
-            keybind: {
-                hold: true,
-                keys: [['w']]
-            },
-            reset: false
-        },
-        {
-            ordered_artifacts: ['Left Look', 'Left Look'],
-            keybind: {
-                hold: false,
-                keys: [['a', 'w'], ['c', 'v']]
             },
             reset: false
         },

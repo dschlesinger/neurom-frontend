@@ -8,7 +8,8 @@
     import { Switch } from "$lib/components/ui/switch/index.js";
 
     import { 
-        RotateCcw as Reset
+        RotateCcw as Reset,
+        TriangleAlert
     } from '@lucide/svelte'
 
     import KeyBindingCard from '$lib/components/keybinding/card.svelte';
@@ -19,6 +20,7 @@
         keybinding_presets,
         current_keybindings,
         keybindings_on,
+        current_selected_datasets,
 
         type KeyBinding,
 
@@ -26,12 +28,9 @@
 
     import { 
         updateKeybindOn,
-        setKeybinds
+        setKeybinds,
+        sendDatasetUpdate
     } from '$lib/components/backend/websocket.svelte'
-
-    let current_selected_datasets = $state([
-        available_datasets.current[0]
-    ]);
 
     function artifactCombinationValid(artifacts: string[], index: number): boolean {
         // Return true if can be added false if not
@@ -87,18 +86,22 @@
 </script>
 
 {#snippet dataset_select()}
-<Select.Root type="multiple" name="selectDatasets" bind:value={current_selected_datasets}>
+<Select.Root type="multiple" name="selectDatasets" bind:value={current_selected_datasets.current} onValueChange={sendDatasetUpdate}>
     <Select.Trigger 
-        class="bg-slate-700/50 text-white border border-slate-600 hover:bg-slate-600/50 focus:ring-cyan-500 transition-all duration-200"
+        class="bg-slate-800 text-white border border-slate-700 hover:bg-slate-700 transition-colors"
     >
-        Select Datasets
+        {#if current_selected_datasets.current.length > 0}
+            Select Datasets
+        {:else}
+            <div class="text-amber-500 block text-sm">No Dataset selected! <TriangleAlert size={12} class='stroke-amber-500' /></div>
+        {/if}
     </Select.Trigger>
-    <Select.Content class='bg-slate-800 text-white border border-slate-700/50 backdrop-blur-md'>
+    <Select.Content class='bg-slate-900 text-white border border-slate-700'>
         <Select.Group>
-        <Select.Label class="text-slate-300">Select Multiple to Combine</Select.Label>
+        <Select.Label>Select Multiple to Combine</Select.Label>
         {#each available_datasets.current as ads}
             <Select.Item
-                class='data-selected:bg-cyan-500/40 hover:bg-slate-700/50 transition-colors'
+                class='data-selected:bg-cyan-500/40'
                 value={ads}
                 label={ads}
             >

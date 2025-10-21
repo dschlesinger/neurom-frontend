@@ -320,7 +320,8 @@
 							<Button
 								class="bg-green-700"
 								onclick={() => {
-									saveDataset(dataset_name)
+									saveDataset(dataset_name);
+									toast.success('Dataset saved!')
 								}}
 							>
 								Save

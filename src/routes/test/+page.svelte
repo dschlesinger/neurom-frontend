@@ -18,7 +18,10 @@
 
     import {
         sendDatasetUpdate,
-        startTest
+        startTest,
+
+        testOnData,
+
     } from '$lib/components/backend/websocket.svelte'
 
     import * as Select from "$lib/components/ui/select/index.js";
@@ -27,7 +30,7 @@
     import * as Card from "$lib/components/ui/card/index.js";
     import { PieChart, Text } from "layerchart";
 
-    import { FlaskConical, Zap, Check, X, FileText, TriangleAlert } from '@lucide/svelte';
+    import { FlaskConical, Zap, Check, X, FileText, TriangleAlert, RotateCcw as Reset } from '@lucide/svelte';
 
     import {
     } from '$lib/components/global_vars.svelte'
@@ -252,13 +255,13 @@
 
                 <!-- Confusion Matrix -->
                  <div class='flex-shrink-0 hidden md:block'>
-                    <Card.Root class="flex flex-col w-56 lg:w-72 bg-gradient-to-br from-slate-800 to-slate-900 text-white border border-slate-700/50 shadow-xl">
+                    <Card.Root class="flex flex-col min-w-56 lg:min-w-72 bg-gradient-to-br from-slate-800 to-slate-900 text-white border border-slate-700/50 shadow-xl">
                         <Card.Header class="pb-2">
                             <Card.Title class='text-center text-lg'>Confusion Matrix</Card.Title>
                             <Card.Description class='text-slate-400 text-sm text-center'>With { dataset_artifacts.current.length } Artifacts</Card.Description>
                         </Card.Header>
                         <Card.Content class="flex-1">
-                            <div class={`grid grid-cols-${dataset_artifacts.current.length} gap-1`}>
+                            <div class="grid gap-1 max-w-full overflow-x-auto" style="grid-template-columns: repeat({dataset_artifacts.current.length}, minmax(0, 1fr));">
                                 {#each confusion_matrix as row, r}
                                     {#each row as point, c}
 
@@ -337,13 +340,23 @@
                     <Button
                         class='bg-gradient-to-r from-lime-500 to-green-600 hover:from-lime-400 hover:to-green-500 text-white font-semibold shadow-lg transition-all duration-200'
                         onclick={() => {
-                            // Get data on self test
-
-                            // replace current tests
+                            testOnData();
                         }}
                     >
                         Test on Data
                         <FileText size={18} class="ml-2" />
+                    </Button>
+                    <Button
+                        class='bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-400 hover:to-red-500 text-white font-semibold shadow-lg transition-all duration-200'
+                        onclick={() => {
+                            // Get data on self test
+                            test_results.current = []
+
+                            // replace current tests
+                        }}
+                    >
+                        Reset
+                        <Reset size={18} class="ml-2" />
                     </Button>
             </div>
 
