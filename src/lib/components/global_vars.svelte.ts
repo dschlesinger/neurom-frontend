@@ -101,6 +101,10 @@ export interface KeyBinding {
     reset: boolean
 }
 
+export let keybinding_que: {current: string[]} = $state({
+    current: []
+})
+
 export let current_keybindings: {current: KeyBinding[]} = $state({
     current: [
         {

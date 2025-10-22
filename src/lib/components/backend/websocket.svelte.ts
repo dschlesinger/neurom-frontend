@@ -2,7 +2,8 @@ import {
     connectionStatus,
     current_selected_datasets,
     keybindings_on,
-    current_keybindings
+    current_keybindings,
+    keybinding_que
 } from '$lib/components/global_vars.svelte'
 
 import {
@@ -11,6 +12,7 @@ import {
 
 export let websocket: WebSocket | undefined;
 export let statusUpdater: EventSource | undefined;
+export let queUpdater: EventSource | undefined;
 
 // Handle reception
 
@@ -44,6 +46,7 @@ export async function connectToBackend() {
             }))
 
             connectToStatusUpdater();
+            connectToKeybindQue();
 
             get_datasets_list();
 
@@ -95,6 +98,38 @@ function connectToStatusUpdater() {
     catch (error) {
         console.log('status updater error')
         statusUpdater = undefined;
+    }
+
+}
+
+function connectToKeybindQue() {
+
+    try {
+
+        queUpdater = new EventSource('http://localhost:8000/keybinding-que');
+
+        queUpdater.onopen = () => {
+            console.log('Keybinding que connected')
+        }
+
+        queUpdater.onmessage = ((m) => {
+            let s = JSON.parse(m.data);
+            console.log('que recieved', s);
+            keybinding_que.current = s.que;
+        })
+
+        queUpdater.onerror = (error) => {
+            queUpdater.close()
+            keybinding_que.current = [];
+
+            setTimeout(connectToKeybindQue, 3000);
+        }
+
+    }
+    
+    catch (error) {
+        console.log('status updater error')
+        queUpdater = undefined;
     }
 
 }

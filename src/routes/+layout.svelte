@@ -57,6 +57,10 @@
 			'name': 'Keybindings',
 			'route': '/keybinding'
 		},
+		{
+			'name': 'Use',
+			'route': '/use'
+		}
 	];
 
 	onMount(connectToBackend);
