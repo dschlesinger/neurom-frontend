@@ -274,6 +274,21 @@ export function startTest(classification: string): undefined {
 
 }
 
+export function clearque() {
+    
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'clear_que',
+            'data': {}
+        })
+    )
+}
+
 
 export function startAnomolyDetection(name: string) {
 

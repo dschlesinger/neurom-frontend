@@ -102,7 +102,7 @@ export interface KeyBinding {
 }
 
 export let keybinding_que: {current: string[]} = $state({
-    current: []
+    current: ['Single Blink', 'Double Blink']
 })
 
 export let current_keybindings: {current: KeyBinding[]} = $state({

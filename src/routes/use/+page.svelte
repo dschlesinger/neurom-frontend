@@ -4,9 +4,14 @@
         keybinding_que
     } from '$lib/components/global_vars.svelte'
 
+    import {
+        clearque
+    } from '$lib/components/backend/websocket.svelte'
+
+    import Button from '$lib/components/ui/button/button.svelte';
     import Separator from '$lib/components/ui/separator/separator.svelte';
 
-    import { MoveLeft } from '@lucide/svelte';
+    import { MoveRight } from '@lucide/svelte';
 
 </script>
 
@@ -21,18 +26,40 @@
 
          <Separator />
 
+            
+        <div class='mx-auto h-full flex items-center justify-center'>
+
+            <div class="flex-col">
+                <div class='flex items-center gap-x-2'>
+                    
+                    {#each keybinding_que.current as kb, i}
+
+                        <div class="text-white text-lg p-2 bg-gradient-to-bl from-cyan-400 to-blue-500 rounded-mb border-slate-800 border-1 rounded-md">
+                            {kb}
+                        </div>
+
+                        {#if i != keybinding_que.current.length - 1}
+
+                            <MoveRight color='white' size={24} />
+                        
+                        {/if}
+
+                    {/each}
+
+                </div>
+
+                <Button
+                    variant='destructive'
+                    onclick={clearque}
+                >
+                    Reset Que
+                </Button>
+
+            </div>
+
+        </div>
+
     </div>
 
-    <div class='mx-auto justify-center'>
-
-        {#each keybinding_que.current as kb, i}
-
-            {kb}
-
-            <MoveLeft color='white' size={12} />
-
-        {/each}
-
-    </div>
 
 </div>

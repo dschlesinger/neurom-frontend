@@ -29,7 +29,7 @@
     import { 
         updateKeybindOn,
         setKeybinds,
-        sendDatasetUpdate
+        sendDatasetUpdate,
     } from '$lib/components/backend/websocket.svelte'
 
     function artifactCombinationValid(artifacts: string[], index: number): boolean {
