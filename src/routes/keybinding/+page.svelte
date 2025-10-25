@@ -2,9 +2,11 @@
 
     import Button from "$lib/components/ui/button/button.svelte";
     import Separator from "$lib/components/ui/separator/separator.svelte";
+    import * as Dialog from "$lib/components/ui/dialog/index.js";
     import * as Select from "$lib/components/ui/select/index.js";
     import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
     import { Label } from "$lib/components/ui/label/index.js";
+    import { Input } from "$lib/components/ui/input/index.js";
     import { Switch } from "$lib/components/ui/switch/index.js";
 
     import { 
@@ -30,6 +32,9 @@
         updateKeybindOn,
         setKeybinds,
         sendDatasetUpdate,
+        loadKeybindingPreset,
+        saveKeybindings,
+
     } from '$lib/components/backend/websocket.svelte'
 
     function artifactCombinationValid(artifacts: string[], index: number): boolean {
@@ -82,6 +87,8 @@
     }
 
     let keybind_up_to_date = $derived(compareKeybindState(current_keybindings.current, last_keybind_state));
+
+    let keybind_name = $state('');
 
 </script>
 
@@ -137,16 +144,19 @@
             variant='destructive'
             class='w-full bg-gradient-to-r from-red-500/30 to-red-600/20 hover:from-red-500/40 hover:to-red-600/30 text-red-300 border border-red-500/40 transition-all duration-200'
                 onclick={() => {
-
+                    current_keybindings.current = []
                 }}
             >
-                Reset
+                Blank
             </Button>
 
             {#each keybinding_presets.current as kp}
 
                 <Button
                     class='w-full bg-gradient-to-r from-cyan-500/30 to-blue-600/20 hover:from-cyan-500/40 hover:to-blue-600/30 text-cyan-300 border border-cyan-500/40 transition-all duration-200'
+                    onclick={() => {
+                        loadKeybindingPreset(kp);
+                    }}
                 >
                     { kp }
                 </Button>
@@ -234,7 +244,7 @@
                 <Switch onCheckedChange={() => {updateKeybindOn()}} bind:checked={keybindings_on.current} id="kb-on" class='data-[state=unchecked]:bg-red-500 data-[state=checked]:bg-green-500 rotate-180' />
 
                 <Button 
-                    class='bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold w-64 shadow-lg hover:shadow-blue-500/20 transition-all duration-200'
+                    class='bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold min-w-32 shadow-lg hover:shadow-blue-500/20 transition-all duration-200'
                     onclick={
                         () => {
                             last_keybind_state = JSON.stringify(current_keybindings.current)
@@ -244,6 +254,33 @@
                 >
                     Update Keybindings
                 </Button>
+
+                <Dialog.Root>
+
+                    <Dialog.Trigger>
+                        <Button 
+                            class='bg-gradient-to-r from-lime-500 to-green-600 hover:from-lime-400 hover:to-green-500 text-white font-semibold min-w-32 shadow-lg hover:shadow-green-500/20 transition-all duration-200'
+                        >
+                            Save Keybindings
+                        </Button>
+                    </Dialog.Trigger>
+                    
+                    <Dialog.Content class="sm:max-w-[425px] bg-slate-950 text-white">
+                        <Dialog.Header>
+                            <Dialog.Title>Save Keybinding</Dialog.Title>
+                        </Dialog.Header>
+                            <div class="flex items-center gap-4">
+                                <Label for="name" class="text-right">Name</Label>
+                                <Input id="name" bind:value={keybind_name} placeholder="..." class="col-span-3 text-black" />
+                                <Button
+                                    onclick={() => {
+                                        saveKeybindings(keybind_name)
+                                        keybind_name = ''
+                                    }}
+                                >Save</Button>
+                            </div>
+                    </Dialog.Content>
+                </Dialog.Root>
 
                 <Button 
                     variant='destructive'

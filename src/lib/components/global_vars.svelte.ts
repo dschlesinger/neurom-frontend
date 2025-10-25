@@ -75,10 +75,7 @@ export let available_datasets = $state({
 
 // Keybinding presets
 export let keybinding_presets = $state({
-    current: [
-        'Basic 9',
-        'Snake 4'
-    ]
+    current: []
 })
 
 export interface KeyAction {

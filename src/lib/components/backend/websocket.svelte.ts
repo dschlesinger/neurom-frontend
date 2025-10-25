@@ -49,6 +49,7 @@ export async function connectToBackend() {
             connectToKeybindQue();
 
             get_datasets_list();
+            get_all_keybinds();
 
         }
 
@@ -131,6 +132,43 @@ function connectToKeybindQue() {
         console.log('status updater error')
         queUpdater = undefined;
     }
+
+}
+
+export function saveKeybindings(name: string) {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'save_keybinds',
+            'data': {
+                'name': name,
+                'keybinds': current_keybindings.current,
+            }
+        })
+    )
+
+}
+
+export function loadKeybindingPreset(name: string) {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'load_keybinds',
+            'data': {
+                'name': name
+            }
+        })
+    )
 
 }
 
@@ -287,6 +325,22 @@ export function clearque() {
             'data': {}
         })
     )
+}
+
+export function get_all_keybinds() {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'get_all_keybindings',
+            'data': {}
+        })
+    )
+
 }
 
 

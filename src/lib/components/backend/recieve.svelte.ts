@@ -4,7 +4,9 @@ import {
     available_datasets,
     dataset_artifacts,
     test_results,
-    testing_stage
+    testing_stage,
+    keybinding_presets,
+    current_keybindings
 } from '$lib/components/global_vars.svelte'
 
 export function handle_message(message: Map<string, any>): undefined {
@@ -51,6 +53,14 @@ export function handle_message(message: Map<string, any>): undefined {
             testing_stage.current = 'sample'
 
             break;
+
+        case 'send_all_keybindings':
+
+            keybinding_presets.current = message['data']['keybindings']
+
+        case 'update_keybindings':
+
+            current_keybindings.current = message['data']['keybindings']
 
         default:
 
