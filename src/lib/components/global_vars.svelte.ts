@@ -78,6 +78,10 @@ export let keybinding_presets = $state({
     current: []
 })
 
+export let functional_kbs = $state({
+    current: []
+})
+
 export interface KeyAction {
     // Whether to hold key down
     hold: Boolean
@@ -103,16 +107,7 @@ export let keybinding_que: {current: string[]} = $state({
 })
 
 export let current_keybindings: {current: KeyBinding[]} = $state({
-    current: [
-        {
-            ordered_artifacts: ['Single Blink', 'Single Blink'],
-            keybind: {
-                hold: false,
-                keys: [['space']]
-            },
-            reset: false
-        },
-    ]
+    current: []
 })
 
 interface SensorSampleData {

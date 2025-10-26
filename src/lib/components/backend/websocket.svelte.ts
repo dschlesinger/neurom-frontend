@@ -50,6 +50,7 @@ export async function connectToBackend() {
 
             get_datasets_list();
             get_all_keybinds();
+            get_functional_kbs();
 
         }
 
@@ -149,6 +150,22 @@ export function saveKeybindings(name: string) {
                 'name': name,
                 'keybinds': current_keybindings.current,
             }
+        })
+    )
+
+}
+
+export function get_functional_kbs() {
+
+    if (websocket === undefined) {
+        console.log('No websocket connection')
+        return
+    }
+
+    websocket.send(
+        JSON.stringify({
+            'type': 'get_functional_kbs',
+            'data': {}
         })
     )
 

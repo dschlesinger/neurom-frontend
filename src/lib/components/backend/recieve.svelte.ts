@@ -6,7 +6,8 @@ import {
     test_results,
     testing_stage,
     keybinding_presets,
-    current_keybindings
+    current_keybindings,
+    functional_kbs
 } from '$lib/components/global_vars.svelte'
 
 export function handle_message(message: Map<string, any>): undefined {
@@ -54,13 +55,23 @@ export function handle_message(message: Map<string, any>): undefined {
 
             break;
 
+        case 'send_functional_kbs':
+
+            functional_kbs.current = message['data']['func_kbs']
+
+            break;
+
         case 'send_all_keybindings':
 
             keybinding_presets.current = message['data']['keybindings']
 
+            break;
+
         case 'update_keybindings':
 
             current_keybindings.current = message['data']['keybindings']
+
+            break;
 
         default:
 

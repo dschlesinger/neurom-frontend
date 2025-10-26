@@ -2,7 +2,8 @@
 
     import {
         type KeyBinding,
-        dataset_artifacts
+        dataset_artifacts,
+        functional_kbs,
     } from '$lib/components/global_vars.svelte';
 
     import {
@@ -21,6 +22,7 @@
 
     import Separator from '../ui/separator/separator.svelte';
     import { toast } from 'svelte-sonner';
+    import DialogClose from '../ui/dialog/dialog-close.svelte';
 
     let {
         keybinding = $bindable(),
@@ -211,6 +213,40 @@
                 {/if}
 
             {/each}
+
+            {#if editting_mode}
+                <DropdownMenu.Root>
+
+                    <DropdownMenu.Trigger>
+                        <Button size='icon' class='bg-green-400'>
+                            +
+                        </Button>
+                    </DropdownMenu.Trigger>
+
+                    <DropdownMenu.Content class='bg-slate-950 rounded-md'>
+
+                        <div class="flex flex-col gap-y-1">
+
+                            {#each functional_kbs.current as a}
+
+                                <Button
+                                    onclick={() => {
+                                            keybinding.keybind.keys[keybinding.keybind.keys.length - 1].push(a)
+                                        }
+                                    }
+                                >
+                                    {a}
+                                </Button>
+
+                            {/each}
+                        
+                        </div>
+
+                    </DropdownMenu.Content>
+
+                </DropdownMenu.Root>
+            {/if}
+
 
             <Button
                 size='icon'
